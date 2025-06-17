@@ -10,7 +10,7 @@ INPUT_DIR = "FFPP"  # Folder with 'real/' and 'fake/' subfolders
 OUTPUT_DIR = "processed_data"
 IMG_SIZE = (224, 224)
 FRAME_INTERVAL = 3               # Sample every 3rd frame
-MAX_VIDEOS_PER_CLASS = 3         # Baby step: process only first 3 videos per class
+MAX_VIDEOS_PER_CLASS = 10        # Baby step: process only first 3 videos per class
 
 # --------------------------
 # FACE DETECTOR INIT

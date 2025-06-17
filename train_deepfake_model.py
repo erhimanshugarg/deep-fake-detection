@@ -1,5 +1,4 @@
 import os
-import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras import layers, models
@@ -16,7 +15,7 @@ DATA_DIR = "processed_data"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
 EPOCHS = 10
-MODEL_PATH = "mobilenet_deepfake_model_finetuned.keras"
+MODEL_PATH = "mobilenet_deepfake_model_fine_tuned.keras"
 
 # -----------------------------
 # DATA GENERATORS WITH AUGMENTATION
@@ -102,7 +101,7 @@ history = model.fit(
 model.save(MODEL_PATH)
 print(f"✅ Fine-tuned model saved as {MODEL_PATH}")
 
-# Create 'plots' directory if it doesn't exist
+# Create a 'plots' directory if it doesn't exist
 plots_dir = "plots"
 os.makedirs(plots_dir, exist_ok=True)
 
