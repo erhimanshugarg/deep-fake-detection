@@ -22,6 +22,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping
+from datetime import datetime
 
 # === Configuration ===
 DATASET_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'microexpression_processed'))
@@ -83,6 +84,13 @@ model.fit(
     class_weight=class_weight_dict,
     callbacks=[early_stop]
 )
+
+# === Save Model ===
+timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+model_path = f"microexpression_model_{timestamp}.keras"
+model.save(model_path)
+
+print(f"✅ Model saved to: {model_path}")
 
 # === Evaluate ===
 y_pred = model.predict(X_val)
