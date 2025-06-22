@@ -184,5 +184,6 @@ os.makedirs(models_dir, exist_ok=True)
 # === Save Final Model ===
 timestamp = dt.now().strftime("%Y%m%d_%H%M")
 model_filename = f"microexpression_model_{timestamp}.keras"
+model_path = os.path.join(models_dir, model_filename)
 model.save(model_filename)
 print(f"✅ Final model saved to: {model_filename}")

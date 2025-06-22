@@ -23,7 +23,7 @@ from tensorflow.keras.utils import to_categorical
 from datetime import datetime as dt
 
 # === Configuration ===
-MODEL_PATH = "microexpression_model_20250622_2034.keras"  # Update to test other models
+MODEL_PATH = "models/microexpression_model_20250622_2034.keras"  # Update to test other models
 DATASET_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'microexpression_processed'))
 X_PATH = os.path.join(DATASET_DIR, 'X_sequences.npy')
 Y_PATH = os.path.join(DATASET_DIR, 'y_labels.npy')
