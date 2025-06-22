@@ -9,11 +9,11 @@ from datetime import datetime
 # -----------------------------
 # CONFIGURATION
 # -----------------------------
-DATA_DIR = "processed_data"
+DATA_DIR = "../dataset/processed_data"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
 EPOCHS = 10
-MODEL_PATH = "mobilenet_deepfake_model.keras"  # ✅ Save in .keras format
+MODEL_PATH = "model/mobilenet_deepfake_model.keras"  # ✅ Save in .keras format
 
 # -----------------------------
 # DATA LOADING

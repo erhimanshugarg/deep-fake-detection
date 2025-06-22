@@ -11,11 +11,11 @@ import numpy as np
 # -----------------------------
 # CONFIGURATION
 # -----------------------------
-DATA_DIR = "processed_data"
+DATA_DIR = "../dataset/processed_data"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
 EPOCHS = 10
-MODEL_PATH = "mobilenet_deepfake_model_fine_tuned.keras"
+MODEL_PATH = "model/mobilenet_deepfake_model_fine_tuned.keras"
 
 # -----------------------------
 # DATA GENERATORS WITH AUGMENTATION

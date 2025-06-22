@@ -8,8 +8,8 @@ from datetime import datetime
 # -----------------------------
 # CONFIG
 # -----------------------------
-MODEL_PATH = "mobilenet_deepfake_model.keras"
-DATA_DIR = "processed_data"
+MODEL_PATH = "model/mobilenet_deepfake_model.keras"
+DATA_DIR = "../dataset/processed_data"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
 
