@@ -11,7 +11,7 @@ import pandas as pd
 import glob
 
 
-df = pd.read_csv("batch_results/fusion_batch_results_20250627_1117.csv")
+df = pd.read_csv("batch_results/fusion_batch_results_20250701_2223.csv")
 print(df[['deep_label', 'deep_pred']].value_counts())
 
 # === Config ===
