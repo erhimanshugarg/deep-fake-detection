@@ -1,3 +1,47 @@
+"""
+🎬 Micro-Expression Video Preprocessing Script
+───────────────────────────────────────────────────────────────────────────────
+
+This script preprocesses the CASME2 micro-expression dataset by extracting face 
+regions from video frames and organizing them into an emotion-based directory 
+structure for deep learning model training.
+
+📋 FUNCTIONALITY:
+- Loads video files from the CASME2 dataset
+- Processes emotion labels from an Excel metadata file
+- Maps raw emotions to 3 standardized categories (positive, negative, surprise)
+- Extracts face regions from video frames using OpenCV's Haar Cascade detector
+- Resizes face images to a consistent format (224×224 pixels)
+- Saves processed images in an organized directory structure by emotion class
+
+🧠 ARCHITECTURE:
+- Face Detection: OpenCV Haar Cascade (lightweight, CPU-based detection)
+- Emotion Mapping: Custom mapping function for CASME2 emotion categories
+- Frame Processing: Sequential extraction and saving of video frames
+- Error Handling: Skips frames where face detection fails
+
+📊 INPUT/OUTPUT:
+- Input:
+  - CASME2 video files (.avi format)
+  - CASME2 coding Excel file with emotion labels
+  - Expected structure: dataset/CASME2/sub*/video_name.avi
+- Output:
+  - Processed face images organized by emotion
+  - Structure: dataset/microexpression_processed/{positive,negative,surprise}/video_name/*.jpg
+  - Format: 224×224 RGB images
+
+🔍 USAGE:
+- Ensure CASME2 dataset is downloaded and organized in expected structure
+- Run script: python preprocess.py
+- Monitor progress with built-in progress bars and status messages
+- Resulting dataset is used by load_sequences.py to create training data
+
+📝 NOTES:
+- The script maps raw CASME2 emotions to 3 categories for simplified classification
+- Only processes videos with valid emotion labels (happiness, disgust, repression, surprise)
+- Uses a simple face detection method that may fail on challenging frames
+"""
+
 import os
 import cv2
 import pandas as pd

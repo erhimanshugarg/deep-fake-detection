@@ -1,16 +1,46 @@
 """
-📄 evaluate_microexpression_model.py
-────────────────────────────────────────────
-Evaluate a saved micro-expression model (.keras)
-and generate a classification report and confusion matrix.
+📊 Micro-Expression Model Evaluation Script
+───────────────────────────────────────────────────────────────────────────────
 
-Usage:
-    Place this file inside the `microexpression/` directory.
-    Run with:
-        python evaluate_microexpression_model.py
+This script performs a comprehensive evaluation of a trained micro-expression 
+recognition model on the full dataset. It generates detailed performance metrics
+and visualizations to assess model quality and identify potential weaknesses.
 
-Requirements:
-    - numpy, seaborn, matplotlib, scikit-learn, tensorflow
+📋 FUNCTIONALITY:
+- Loads a trained micro-expression model from the models directory
+- Processes the complete dataset (not just validation split)
+- Generates predictions for all sequences
+- Creates a detailed classification report with precision, recall, and F1-score
+- Visualizes model performance with a confusion matrix
+- Saves the confusion matrix as an image for documentation
+
+🧠 MODEL EVALUATION:
+- Evaluates on the entire dataset to get comprehensive performance metrics
+- Focuses on per-class performance to identify class-specific weaknesses
+- Uses standard metrics (precision, recall, F1) for classification assessment
+- Visualizes error patterns through confusion matrix heatmap
+
+📊 INPUT/OUTPUT:
+- Input:
+  - Trained model: models/microexpression_model_*.keras
+  - Dataset: X_sequences.npy and y_labels.npy from dataset/microexpression_processed/
+- Output:
+  - Console: Detailed classification report with precision, recall, F1-score
+  - Image: Confusion matrix visualization saved to confusion-matrix/
+  - File path: confusion-matrix/confusion_matrix_eval_<timestamp>.png
+
+🔍 USAGE:
+- Update MODEL_PATH variable to point to the specific model you want to evaluate
+- Run script: python evaluate_model.py
+- Review the classification report in console output
+- Examine the confusion matrix image for visual performance assessment
+- Use results to identify model strengths and weaknesses
+
+📝 NOTES:
+- Unlike evaluate_checkpoint.py, this script evaluates on the full dataset
+- The confusion matrix helps identify which classes are commonly confused
+- Timestamp in output filenames helps track multiple evaluation runs
+- This evaluation is useful for final model assessment before deployment
 """
 
 import os

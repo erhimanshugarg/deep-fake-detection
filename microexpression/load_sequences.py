@@ -1,22 +1,46 @@
 """
-────────────────────────────────────────────────────────────────────
-🎯 Purpose: Micro-Expression Sequence Loader for CASME II Dataset
-────────────────────────────────────────────────────────────────────
+🔄 Micro-Expression Sequence Preparation Script
+───────────────────────────────────────────────────────────────────────────────
 
-This script processes the preprocessed video folders located in
-`dataset/microexpression_processed/` and converts them into fixed-length
-frame sequences suitable for deep learning.
+This script converts preprocessed micro-expression video frames into fixed-length
+sequences suitable for temporal deep learning models. It's a critical bridge between
+raw video preprocessing and model training in the micro-expression recognition pipeline.
 
-Each video subfolder under emotion classes (positive, negative, surprise) is:
-- Loaded and resized to (224x224)
-- Stacked into fixed-length sequences (e.g., 16 frames)
-- Labeled numerically: positive → 0, negative → 1, surprise → 2
+📋 FUNCTIONALITY:
+- Loads preprocessed face images from the CASME2 dataset
+- Organizes frames into fixed-length sequences (16 frames per sequence)
+- Handles variable-length videos through padding or truncation
+- Converts emotion class labels to numerical format for training
+- Saves the prepared sequences and labels as NumPy arrays
+- Filters out corrupted frames and videos with insufficient frames
 
-Outputs:
-- X_sequences.npy → shape: (num_samples, seq_len, height, width, channels)
-- y_labels.npy    → shape: (num_samples,)
+🧠 ARCHITECTURE:
+- Sequence Standardization: Fixed-length sequence creation (16 frames)
+- Frame Processing: Loading, resizing, and normalization of image data
+- Label Encoding: Categorical mapping (positive → 0, negative → 1, surprise → 2)
+- Error Handling: Skips corrupted frames and insufficient sequences
 
-💡 Used as input for CNN + LSTM model training.
+📊 INPUT/OUTPUT:
+- Input:
+  - Preprocessed face images from preprocess.py
+  - Structure: dataset/microexpression_processed/{positive,negative,surprise}/video_name/*.jpg
+  - Format: 224×224 RGB images
+- Output:
+  - X_sequences.npy: NumPy array with shape (num_samples, 16, 224, 224, 3)
+  - y_labels.npy: NumPy array with shape (num_samples,) containing class indices
+  - Saved to: dataset/microexpression_processed/
+
+🔍 USAGE:
+- Run after completing preprocess.py
+- Execute: python load_sequences.py
+- Monitor progress with built-in progress bars
+- The output files are used directly by train_model_v4.py for model training
+
+📝 NOTES:
+- Videos with fewer than 16 frames are padded by repeating the last frame
+- Videos with more than 16 frames are truncated to the first 16 frames
+- Videos with fewer than 4 frames or corrupted frames are skipped entirely
+- The sequence length (16) is optimized for micro-expression temporal patterns
 """
 
 import os

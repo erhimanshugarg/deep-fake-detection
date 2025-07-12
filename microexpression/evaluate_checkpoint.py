@@ -1,3 +1,45 @@
+"""
+🔍 Micro-Expression Model Checkpoint Evaluation
+───────────────────────────────────────────────────────────────────────────────
+
+This script evaluates a specific model checkpoint saved during the training process
+to assess its performance on the validation set. It's useful for verifying the 
+quality of intermediate models and comparing different training checkpoints.
+
+📋 FUNCTIONALITY:
+- Loads the preprocessed sequence data used for training
+- Recreates the exact same validation split used during training
+- Loads a specific model checkpoint from the checkpoints directory
+- Generates predictions on the validation set
+- Evaluates model performance with a detailed classification report
+- Displays precision, recall, and F1-score for each emotion class
+
+🧠 MODEL EVALUATION:
+- Uses the same validation data split as the training script
+- Maintains consistent evaluation methodology for fair comparison
+- Focuses on classification metrics rather than loss values
+- Provides class-specific performance metrics
+
+📊 INPUT/OUTPUT:
+- Input:
+  - X_sequences.npy and y_labels.npy from dataset/microexpression_processed/
+  - Saved model checkpoint from checkpoints/best_model_*.keras
+- Output:
+  - Console: Detailed classification report with precision, recall, F1-score
+  - No files are saved by this script
+
+🔍 USAGE:
+- Update the checkpoint path to the specific model you want to evaluate
+- Run script: python evaluate_checkpoint.py
+- Review the classification report in console output
+- Compare results with other checkpoints or the final model
+
+📝 NOTES:
+- The script uses a fixed random seed (42) to ensure the same validation split
+- The checkpoint filename contains the epoch number and validation loss
+- This evaluation is useful for identifying the best checkpoint for deployment
+"""
+
 import os
 import numpy as np
 from tensorflow.keras.models import load_model

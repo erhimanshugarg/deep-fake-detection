@@ -1,15 +1,55 @@
 """
-────────────────────────────────────────────────────────────────────
-🎯 Purpose: Train Micro-Expression Classifier (CNN + LSTM)
-with TensorBoard Logging, Model Checkpointing, Plots, and Confusion Matrix
-────────────────────────────────────────────────────────────────────
+🧠 Micro-Expression Recognition Model Training
+───────────────────────────────────────────────────────────────────────────────
 
-Loads:
-- X_sequences.npy: shape (num_samples, seq_len, 224, 224, 3)
-- y_labels.npy: shape (num_samples) with values {0,1,2}
+This script trains a deep learning model to classify micro-expressions into three
+emotion categories using a hybrid CNN+LSTM architecture. It includes advanced training
+features like TensorBoard logging, model checkpointing, and performance visualization.
 
-Trains a deep learning model to classify micro-expressions
-as positive, negative, or surprise using CNN + LSTM architecture.
+📋 FUNCTIONALITY:
+- Loads preprocessed sequence data created by load_sequences.py
+- Splits data into training and validation sets with stratification
+- Computes class weights to handle imbalanced data distribution
+- Builds a hybrid CNN+LSTM model with MobileNetV2 feature extraction
+- Trains the model with early stopping and checkpoint saving
+- Evaluates model performance on validation data
+- Generates and saves training curves and confusion matrix visualizations
+- Saves the final trained model for later use
+
+🧠 MODEL ARCHITECTURE:
+- Feature Extraction: Pre-trained MobileNetV2 (frozen weights from ImageNet)
+- Temporal Processing: LSTM layer (128 units) for sequence analysis
+- Classification Head: Dense layers (64 units with ReLU, then softmax output)
+- Input: Sequence of 16 frames (224×224×3 each)
+- Output: 3-class probability distribution (positive, negative, surprise)
+- Optimizer: Adam with 1e-4 learning rate
+- Loss: Categorical Cross-Entropy
+
+📊 INPUT/OUTPUT:
+- Input:
+  - X_sequences.npy: shape (num_samples, 16, 224, 224, 3)
+  - y_labels.npy: shape (num_samples) with values {0,1,2}
+  - Located in: dataset/microexpression_processed/
+- Output:
+  - Trained model: microexpression_model_<timestamp>.keras
+  - Training curves: plots/training_curves_<timestamp>.png
+  - Confusion matrix: confusion-matrix/confusion_matrix_<timestamp>.png
+  - TensorBoard logs: logs/fit/<timestamp>/
+  - Model checkpoints: checkpoints/best_model_<epoch>_<val_loss>.keras
+
+🔍 USAGE:
+- Ensure sequence data has been prepared with load_sequences.py
+- Run script: python train_model_v4.py
+- Monitor training progress in console output
+- View TensorBoard logs with: tensorboard --logdir=logs/fit
+- Review training curves and confusion matrix after completion
+- Use the trained model for micro-expression recognition tasks
+
+📝 NOTES:
+- Uses class weighting to handle imbalanced data distribution
+- Early stopping prevents overfitting by monitoring validation loss
+- The base CNN (MobileNetV2) is frozen to prevent overfitting on small dataset
+- Model checkpoints save the best model based on validation loss
 """
 
 import os

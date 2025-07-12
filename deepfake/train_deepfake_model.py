@@ -1,9 +1,55 @@
 """
-🎯 Purpose: Train Deepfake Detection Model v3 (MobileNetV2)
-🧠 Uses:
-- Strong augmentations
-- Class weighting
-- Confusion Matrix + Accuracy plots
+🔍 Advanced Deepfake Detection Model Training
+───────────────────────────────────────────────────────────────────────────────
+
+This script trains a comprehensive deepfake detection model based on MobileNetV2
+with extensive data augmentation and class balancing. It's designed for optimal
+performance and thorough evaluation of model effectiveness.
+
+📋 FUNCTIONALITY:
+- Loads processed face images from the dataset directory
+- Applies strong data augmentation (rotation, zoom, shift, flip, brightness)
+- Computes and applies class weights to handle imbalanced data
+- Builds a MobileNetV2-based model with fine-tuning of all layers
+- Trains the model for an extended period (20 epochs)
+- Saves the trained model in .keras format
+- Generates and saves training accuracy plots and confusion matrix
+
+🧠 MODEL ARCHITECTURE:
+- Base: Pre-trained MobileNetV2 (fine-tuned weights from ImageNet)
+- Feature Extraction: GlobalAveragePooling2D
+- Classification Head: 128-unit dense layer with ReLU + 30% dropout
+- Output: Single sigmoid unit for binary classification (real/fake)
+- Optimizer: Adam with 1e-5 learning rate (slower for fine-tuning)
+- Loss: Binary Cross-Entropy
+
+📊 INPUT/OUTPUT:
+- Input: Processed face images in ../dataset/processed_data/{real,fake}/
+- Output:
+  - Trained model: model/mobilenet_deepfake_model_v3.keras
+  - Accuracy plot: plots/deepfake_acc_plot_<timestamp>.png
+  - Confusion matrix: plots/confusion_matrix_<timestamp>.png
+  - Console output: Training progress, class weights, and classification report
+
+🔍 USAGE:
+- Ensure processed dataset exists in the expected directory
+- Run script: python train_deepfake_model.py
+- Monitor training progress in console output
+- Review accuracy plot and confusion matrix after training completes
+- Use the trained model for deepfake detection in production
+
+📝 COMPARISON TO MINIMAL TRAINING:
+This script implements a more comprehensive training approach than 
+train_deepfake_model_without_aug.py:
+1. Uses extensive data augmentation (vs. minimal augmentation)
+2. Fine-tunes all layers of the base model (vs. feature extraction only)
+3. Uses slower learning rate (1e-5 vs. 1e-4) for more precise weight updates
+4. Trains for more epochs (20 vs. 10) for better convergence
+5. Applies class weighting to handle imbalanced datasets
+6. Generates confusion matrix and detailed classification report
+
+This version is ideal for production models, research, or when maximum 
+detection accuracy is required.
 """
 
 import os

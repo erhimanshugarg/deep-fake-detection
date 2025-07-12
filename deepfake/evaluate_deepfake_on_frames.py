@@ -1,18 +1,47 @@
 """
-🧪 evaluate_deepfake_on_frames.py
-────────────────────────────────────────────
-Evaluates the deepfake detection model on real test frames used in fusion.
-Helps verify if the model is misclassifying real inputs.
+🧪 Deepfake Model Evaluation on Test Frames
+───────────────────────────────────────────────────────────────────────────────
 
-📁 Expected Folder Structure:
-dataset/
-└── processed_data/
-    ├── real/*/*.jpg
-    └── fake/*/*.jpg
+This script evaluates the performance of a trained deepfake detection model on 
+processed face frames. It's designed to verify model accuracy and identify 
+potential misclassifications, especially for real inputs used in the fusion pipeline.
 
-✅ Output:
-- Classification Report
-- Confusion Matrix
+📋 FUNCTIONALITY:
+- Loads a pre-trained deepfake detection model (MobileNetV2-based)
+- Processes test images from both real and fake categories
+- Applies appropriate preprocessing for the model (resize, color conversion)
+- Generates predictions for all test images
+- Evaluates model performance with classification metrics
+- Creates and saves a confusion matrix visualization
+
+🧠 MODEL & ARCHITECTURE:
+- Uses a fine-tuned MobileNetV2 model for deepfake detection
+- Input: 224×224 RGB images (preprocessed with MobileNetV2 requirements)
+- Output: Binary classification (real/fake) with confidence scores
+- Evaluation: Classification report (precision, recall, F1) and confusion matrix
+
+📊 INPUT/OUTPUT:
+- Input:
+  - Pre-trained model: deepfake/model/mobilenet_deepfake_model_fine_tuned.keras
+  - Test images: dataset/processed_data/{real,fake}/*/*.jpg
+- Output:
+  - Console: Detailed classification report with precision, recall, F1-score
+  - Image: Confusion matrix visualization saved as PNG
+  - File path: deepfake/evaluation_confusion_matrix.png
+
+🔍 USAGE:
+- Ensure the processed dataset exists in the expected directory structure
+- Run script: python evaluate_deepfake_on_frames.py
+- Review the classification report in console output
+- Examine the confusion matrix image for visual performance assessment
+- Use results to identify potential model weaknesses or biases
+
+📝 EVALUATION PURPOSE:
+This evaluation is particularly important for:
+1. Validating model performance on test data
+2. Identifying potential biases in classification
+3. Ensuring real faces aren't misclassified as fake (critical for fusion)
+4. Providing quantitative metrics for model comparison
 """
 
 import os

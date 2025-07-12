@@ -1,0 +1,13 @@
+# Deepfake Detection Project Dependencies
+
+# Core libraries
+numpy
+pandas
+tensorflow
+opencv-python
+
+# For Word document generation
+python-docx
+
+# Install with:
+# pip install -r requirements.txt

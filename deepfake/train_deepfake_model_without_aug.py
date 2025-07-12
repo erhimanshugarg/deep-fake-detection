@@ -1,3 +1,53 @@
+"""
+🔍 Deepfake Detection Model Training (Minimal Augmentation)
+───────────────────────────────────────────────────────────────────────────────
+
+This script trains a lightweight deepfake detection model based on MobileNetV2
+with minimal data augmentation. It's designed for quick training cycles and
+baseline model creation.
+
+📋 FUNCTIONALITY:
+- Loads processed face images from the dataset directory
+- Applies minimal data augmentation (only rotation and horizontal flip)
+- Builds a MobileNetV2-based model with frozen base layers (feature extraction only)
+- Trains the model for a short period (10 epochs)
+- Saves the trained model in .keras format
+- Generates and saves training accuracy plots
+
+🧠 MODEL ARCHITECTURE:
+- Base: Pre-trained MobileNetV2 (frozen weights from ImageNet)
+- Feature Extraction: GlobalAveragePooling2D
+- Classification Head: 128-unit dense layer with ReLU + 30% dropout
+- Output: Single sigmoid unit for binary classification (real/fake)
+- Optimizer: Adam with 1e-4 learning rate
+- Loss: Binary Cross-Entropy
+
+📊 INPUT/OUTPUT:
+- Input: Processed face images in ../dataset/processed_data/{real,fake}/
+- Output:
+  - Trained model: model/mobilenet_deepfake_model.keras
+  - Training plot: plots/training_plot_<timestamp>.png
+  - Console output: Training progress and file paths
+
+🔍 USAGE:
+- Ensure processed dataset exists in the expected directory
+- Run script: python train_deepfake_model_without_aug.py
+- Monitor training progress in console output
+- Review accuracy plot after training completes
+
+📝 COMPARISON TO FULL TRAINING:
+This script differs from train_deepfake_model.py in several key ways:
+1. Uses minimal data augmentation (vs. extensive augmentation)
+2. Keeps base model frozen (vs. fine-tuning all layers)
+3. Uses higher learning rate (1e-4 vs. 1e-5)
+4. Trains for fewer epochs (10 vs. 20)
+5. Doesn't use class weighting for imbalanced data
+6. Doesn't generate confusion matrix for evaluation
+
+This version is ideal for quick iterations, baseline comparisons, or when
+computational resources are limited.
+"""
+
 import os
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import MobileNetV2

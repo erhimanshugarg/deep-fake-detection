@@ -1,3 +1,46 @@
+"""
+🎭 FaceForensics++ Preprocessing Script
+───────────────────────────────────────────────────────────────────────────────
+
+This script preprocesses videos from the FaceForensics++ (FFPP) dataset by extracting 
+face frames at regular intervals. It's a critical component in the deepfake detection 
+pipeline that prepares raw video data for model training and evaluation.
+
+📋 FUNCTIONALITY:
+- Processes both real and fake videos from the FFPP dataset
+- Detects faces in video frames using MTCNN (Multi-task Cascaded Convolutional Networks)
+- Extracts, crops, and resizes face regions to a standardized format
+- Saves processed face images in an organized directory structure
+- Maintains class labels (real/fake) for supervised learning
+
+🧠 ARCHITECTURE:
+- Face Detection: MTCNN for robust facial landmark detection
+- Video Processing: OpenCV for frame extraction and image manipulation
+- Sampling Strategy: Processes every Nth frame (configurable) to reduce redundancy
+- Error Handling: Robust exception handling for corrupted frames or detection failures
+
+📊 INPUT/OUTPUT:
+- Input: Raw videos from FaceForensics++ dataset
+  - Expected structure: ../dataset/FFPP/{real,fake}/*.mp4
+- Output: Processed face images
+  - Structure: ../dataset/processed_data/{real,fake}/{video_name}/{frame_id}.jpg
+  - Format: 224×224 RGB images (configurable)
+
+🔍 USAGE:
+- Ensure FFPP dataset is downloaded and organized in expected structure
+- Adjust configuration parameters as needed (paths, image size, etc.)
+- Run script: python preprocess_ffpp.py
+- Monitor progress with built-in progress bars and status messages
+- Resulting dataset can be used for training deepfake detection models
+
+📝 PIPELINE ROLE:
+This preprocessing step is essential for:
+1. Standardizing input data for consistent model training
+2. Focusing on facial regions where manipulation artifacts are most visible
+3. Creating a clean, organized dataset structure for efficient data loading
+4. Reducing storage requirements by extracting only relevant frames
+"""
+
 import os
 import cv2
 from mtcnn import MTCNN
