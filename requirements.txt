@@ -5,6 +5,10 @@ numpy
 pandas
 tensorflow
 opencv-python
+streamlit
+joblib
+gradio==5.38.0
+scikit-learn==1.5.2
 
 # For Word document generation
 python-docx
