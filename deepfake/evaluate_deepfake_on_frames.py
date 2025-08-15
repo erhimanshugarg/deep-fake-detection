@@ -4,7 +4,7 @@
 
 This script evaluates the performance of a trained deepfake detection model on 
 processed face frames. It's designed to verify model accuracy and identify 
-potential misclassifications, especially for real inputs used in the fusion pipeline.
+potential misclassifications, especially for real inputs used in the fusion1 pipeline.
 
 📋 FUNCTIONALITY:
 - Loads a pre-trained deepfake detection model (MobileNetV2-based)
@@ -40,7 +40,7 @@ potential misclassifications, especially for real inputs used in the fusion pipe
 This evaluation is particularly important for:
 1. Validating model performance on test data
 2. Identifying potential biases in classification
-3. Ensuring real faces aren't misclassified as fake (critical for fusion)
+3. Ensuring real faces aren't misclassified as fake (critical for fusion1)
 4. Providing quantitative metrics for model comparison
 """
 

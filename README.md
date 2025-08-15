@@ -23,7 +23,7 @@ pip install -r requirements.txt
 Run the fusion batch prediction script to analyze a set of images and generate results:
 
 ```bash
-python fusion/fusion_batch_predict.py
+python fusion1/fusion_batch_predict.py
 ```
 
 This will:

@@ -1,23 +1,10 @@
 """
-🎯 prepare_fusion_inputs.py (Updated)
-────────────────────────────────────────────
-Creates demo input files for fusion prediction using preprocessed images.
+prepare_fusion_inputs.py (Updated for 6-class micro-expression model)
 
-✔️ Extracts:
-- A face frame from deepfake/processed_data/real/
-- A 16-frame sequence from microexpression_processed/
-
-📁 Expected Structure:
-dataset/
-├── processed_data/
-│   ├── real/video_id/frame.jpg
-│   └── fake/video_id/frame.jpg
-├── microexpression_processed/
-│   └── emotion_class/video_id/*.jpg
-
-🔽 Output:
-- fusion/X_deepfake.npy
-- fusion/X_microexpression.npy
+- Extracts one representative face frame from deepfake real dataset
+- Extracts one 16-frame micro-expression sequence from microexpression dataset
+- Preprocesses images (resize, color convert, normalize) consistent with batch pipeline
+- Saves numpy arrays as X_deepfake.npy and X_microexpression.npy in fusion/inputs/
 """
 
 import os
@@ -29,49 +16,52 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # === Paths ===
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dataset_dir = os.path.join(project_root, 'dataset')
+fusion_input_dir = os.path.join(project_root, 'fusion', 'inputs')
+os.makedirs(fusion_input_dir, exist_ok=True)
 
-# === Deepfake Input ===
-real_frame_path = glob(os.path.join(dataset_dir, 'processed_data', 'real', '*', '*.jpg'))[0]
-deep_img = cv2.imread(real_frame_path)
+# === Deepfake Input: pick one real frame ===
+real_frame_paths = sorted(glob(os.path.join(dataset_dir, 'processed_data', 'real', '*', '*.jpg')))
+if len(real_frame_paths) == 0:
+    raise Exception("No real frames found in processed_data/real/")
+deep_img_path = real_frame_paths[0]
+
+deep_img = cv2.imread(deep_img_path)
 deep_img = cv2.resize(deep_img, (224, 224))
 deep_img = cv2.cvtColor(deep_img, cv2.COLOR_BGR2RGB)
 deep_img = preprocess_input(deep_img.astype(np.float32))
-deep_img = np.expand_dims(deep_img, axis=0)  # (1, 224, 224, 3)
+deep_img = np.expand_dims(deep_img, axis=0)  # shape (1, 224, 224, 3)
 
-# Save
-fusion_dir = os.path.join(project_root, 'fusion')
-os.makedirs(fusion_dir, exist_ok=True)
-np.save(os.path.join(fusion_dir, 'X_deepfake.npy'), deep_img)
-print("✅ Saved: X_deepfake.npy")
+np.save(os.path.join(fusion_input_dir, 'X_deepfake.npy'), deep_img)
+print(f"✅ Saved deepfake input: {os.path.join(fusion_input_dir, 'X_deepfake.npy')}")
 
-# === Microexpression Input ===
-# Find one sequence with at least 16 frames
-micro_seq_root = os.path.join(dataset_dir, 'microexpression_processed')
-class_dirs = [d for d in glob(os.path.join(micro_seq_root, '*')) if os.path.isdir(d)]
+# === Micro-expression Input: find one sequence with at least 16 frames ===
+microexpression_root = os.path.join(dataset_dir, 'microexpression_processed')
+emotion_dirs = sorted([d for d in glob(os.path.join(microexpression_root, '*')) if os.path.isdir(d)])
 
 sequence = []
-found = False
-for class_dir in class_dirs:
-    video_dirs = [v for v in glob(os.path.join(class_dir, '*')) if os.path.isdir(v)]
+found_sequence = False
+
+for emotion_dir in emotion_dirs:
+    video_dirs = sorted([v for v in glob(os.path.join(emotion_dir, '*')) if os.path.isdir(v)])
     for video_dir in video_dirs:
-        frames = sorted(glob(os.path.join(video_dir, '*.jpg')))
-        if len(frames) >= 16:
-            for f in frames[:16]:
+        frame_paths = sorted(glob(os.path.join(video_dir, '*.jpg')))
+        if len(frame_paths) >= 16:
+            for f in frame_paths[:16]:
                 img = cv2.imread(f)
                 img = cv2.resize(img, (224, 224))
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                img = img.astype(np.float32) / 255.0
+                img = img.astype(np.float32) / 255.0  # scale as [0, 1]
                 sequence.append(img)
-            found = True
+            found_sequence = True
             break
-    if found:
+    if found_sequence:
         break
 
-if not found:
-    raise Exception("❌ Could not find a 16-frame microexpression sequence")
+if not found_sequence:
+    raise Exception("❌ Could not find a 16-frame micro-expression sequence")
 
-X_seq = np.expand_dims(np.array(sequence), axis=0)  # (1, 16, 224, 224, 3)
-np.save(os.path.join(fusion_dir, 'X_microexpression.npy'), X_seq)
-print("✅ Saved: X_microexpression.npy")
+X_micro = np.expand_dims(np.array(sequence), axis=0)  # shape (1, 16, 224, 224, 3)
+np.save(os.path.join(fusion_input_dir, 'X_microexpression.npy'), X_micro)
+print(f"✅ Saved micro-expression input: {os.path.join(fusion_input_dir, 'X_microexpression.npy')}")
 
 print("🎉 Fusion input preparation complete.")

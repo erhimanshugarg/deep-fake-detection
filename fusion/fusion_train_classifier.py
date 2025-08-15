@@ -1,105 +1,85 @@
 """
-🔄 Fusion Classifier Training Script
-───────────────────────────────────────────────────────────────────────────────
-
-This script trains a machine learning model that combines outputs from two 
-independent deepfake detection systems:
-1. Deepfake Detection Model: Identifies manipulated face images
-2. Micro-Expression Recognition Model: Analyzes facial emotion sequences
-
-📋 FUNCTIONALITY:
-- Loads a fusion training dataset containing scores from both models
-- Trains a Logistic Regression classifier to make the final liveness decision
-- Evaluates model performance with classification metrics and confusion matrix
-- Saves the trained model, scaler, and evaluation plots
-
-🧠 MODEL DETAILS:
-- Algorithm: Logistic Regression (binary classification)
-- Features: 2-dimensional input [deep_score, micro_score]
-- Target: Binary classification (1 = LIVE, 0 = SPOOF)
-- Preprocessing: StandardScaler for feature normalization
-
-📊 INPUT/OUTPUT:
-- Input: fusion_training_dataset.csv (created by fusion_dataset_builder.py)
-- Output:
-  - Trained model: fusion/fusion_classifier_model_<timestamp>.joblib
-  - Feature scaler: fusion/fusion_scaler_<timestamp>.joblib
-  - Confusion matrix: fusion/plots/fusion_confusion_matrix_<timestamp>.png
-  - Console output: Classification report and file paths
-
-🔍 USAGE:
-- Run this script after generating a fusion training dataset
-- The trained model can be used by fusion_batch_predict.py for liveness verification
-- Typical accuracy: ~95% (see fusion/docs/fusion_evaluation_log.md)
-
-📝 FUSION STRATEGY:
-The fusion approach implements a "Late Fusion" strategy at the score level,
-combining confidence scores from both models to make a more robust liveness
-decision than either model could make independently.
+fusion_train_classifier.py (Updated to train with all micro-expression probability scores)
 """
 
+import os
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix
+import joblib
+from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-from datetime import datetime
 
-# === Load Fusion Training Dataset ===
-csv_path = "fusion_training_dataset.csv"
-print(f"📄 Loading dataset from: {csv_path}")
-df = pd.read_csv(csv_path)
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+import xgboost as xgb
+from sklearn.metrics import classification_report, confusion_matrix
 
-# === Features and Labels ===
-X = df[['deep_score', 'micro_score']].values
-y = (df['fusion_label'] == 'LIVE').astype(int).values  # 1 = LIVE, 0 = SPOOF
+dataset_path = "fusion_training_dataset.csv"
+if not os.path.exists(dataset_path):
+    raise FileNotFoundError(f"❌ {dataset_path} not found! Please run fusion_dataset_builder.py first.")
 
-# === Train-Test Split ===
+print(f"📄 Loading dataset from: {dataset_path}")
+df = pd.read_csv(dataset_path)
+
+# Features: deep_score + all micro-expression probabilities
+micro_prob_cols = [col for col in df.columns if col.startswith("micro_score_")]
+feature_cols = ["deep_score"] + micro_prob_cols
+
+X = df[feature_cols].values
+y = (df['fusion_label'] == 'LIVE').astype(int).values
+
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y, stratify=y, test_size=0.2, random_state=42
 )
 
-# === Standardize Features ===
 scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+X_train_s = scaler.fit_transform(X_train)
+X_test_s = scaler.transform(X_test)
 
-# === Train Classifier ===
-clf = LogisticRegression()
-clf.fit(X_train_scaled, y_train)
+print("🖥 Training Random Forest...")
+rf = RandomForestClassifier(n_estimators=200, random_state=42)
+rf.fit(X_train_s, y_train)
 
-# === Evaluate Model ===
-y_pred = clf.predict(X_test_scaled)
-report = classification_report(y_test, y_pred, target_names=["SPOOF", "LIVE"])
-print("\n📊 Classification Report:\n", report)
+print("🖥 Training XGBoost...")
+xgb_clf = xgb.XGBClassifier(
+    eval_metric='logloss',
+    random_state=42
+)
+xgb_clf.fit(X_train_s, y_train)
 
-# === Confusion Matrix ===
-cm = confusion_matrix(y_test, y_pred)
+rf_pred = rf.predict(X_test_s)
+xgb_pred = xgb_clf.predict(X_test_s)
+vote_pred = np.round((rf_pred + xgb_pred) / 2).astype(int)
+
+print("\n📊 RF Report:\n", classification_report(y_test, rf_pred, target_names=["SPOOF", "LIVE"]))
+print("\n📊 XGB Report:\n", classification_report(y_test, xgb_pred, target_names=["SPOOF", "LIVE"]))
+print("\n📊 Voting Report:\n", classification_report(y_test, vote_pred, target_names=["SPOOF", "LIVE"]))
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+joblib_dir = os.path.join("fusion", "joblib")
+plots_dir = os.path.join("fusion", "plots")
+os.makedirs(joblib_dir, exist_ok=True)
+os.makedirs(plots_dir, exist_ok=True)
+
+joblib.dump(rf, os.path.join(joblib_dir, f"fusion_rf_model_{timestamp}.joblib"))
+joblib.dump(xgb_clf, os.path.join(joblib_dir, f"fusion_xgb_model_{timestamp}.joblib"))
+joblib.dump(scaler, os.path.join(joblib_dir, f"fusion_scaler_{timestamp}.joblib"))
+
+print(f"\n✅ Models and scaler saved with timestamp: {timestamp}")
+
+cm = confusion_matrix(y_test, vote_pred)
 labels = ["SPOOF", "LIVE"]
 
 plt.figure(figsize=(6, 5))
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
-plt.title("Fusion Classifier - Confusion Matrix")
+plt.title(f"Fusion Voting Confusion Matrix ({timestamp})")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 
-# === Save Confusion Matrix ===
-timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-plot_dir = os.path.join("fusion", "plots")
-os.makedirs(plot_dir, exist_ok=True)
-plot_path = os.path.join(plot_dir, f"fusion_confusion_matrix_{timestamp}.png")
-plt.savefig(plot_path)
-print(f"📊 Confusion matrix saved to: {plot_path}")
+cm_path = os.path.join(plots_dir, f"fusion_voting_confusion_{timestamp}.png")
+plt.savefig(cm_path)
+plt.close()
 
-# === Save Model and Scaler ===
-import joblib
-model_path = os.path.join("fusion", f"fusion_classifier_model_{timestamp}.joblib")
-scaler_path = os.path.join("fusion", f"fusion_scaler_{timestamp}.joblib")
-joblib.dump(clf, model_path)
-joblib.dump(scaler, scaler_path)
-print(f"✅ Model saved to: {model_path}")
-print(f"✅ Scaler saved to: {scaler_path}")
+print(f"📈 Confusion matrix plot saved to: {cm_path}")

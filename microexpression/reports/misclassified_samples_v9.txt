@@ -1,0 +1,9 @@
+Index: 15, True: 0, Pred: 2
+Index: 17, True: 0, Pred: 3
+Index: 76, True: 1, Pred: 3
+Index: 138, True: 4, Pred: 5
+Index: 139, True: 4, Pred: 3
+Index: 154, True: 5, Pred: 1
+Index: 171, True: 5, Pred: 1
+Index: 194, True: 5, Pred: 1
+Index: 219, True: 5, Pred: 1
